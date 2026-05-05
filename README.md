@@ -42,7 +42,7 @@ User's code snippet
 ### 1. Clone the repository
 
 ```bash
-#git clone https://github.com/NisargKadam/Langchain_sample_project.git
+git clone https://github.com/Komal040691/Agentic_AI_Projects.git
 cd Langchain_sample_project_assignment
 ```
 
@@ -86,7 +86,7 @@ OPENAI_API_KEY=sk-your-actual-key-here
 ## Run
 
 ```bash
-python email_humanizer.py
+python Code Explainer.py
 ```
 
 You'll see an interactive prompt:
