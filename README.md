@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Code Explainer - LangChain Single Agent Project
 
 A beginner-friendly project that teaches you how to build a **single agent** using **LangChain + OpenAI**. The agent takes a code snippet and explains it in simple, plain English suitable for beginners.
