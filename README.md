@@ -1,6 +1,6 @@
-# Email Humanizer - LangChain Single Agent Project
+# Code Explainer - LangChain Single Agent Project
 
-A beginner-friendly project that teaches you how to build a **single agent** using **LangChain + OpenAI**. The agent takes a brief email idea and generates a natural, human-sounding email.
+A beginner-friendly project that teaches you how to build a **single agent** using **LangChain + OpenAI**. The agent takes a code snippet and explains it in simple, plain English suitable for beginners.
 
 ## What You'll Learn
 
@@ -13,22 +13,22 @@ A beginner-friendly project that teaches you how to build a **single agent** usi
 ## How It Works
 
 ```
-User's email idea
+User's code snippet
        |
        v
-  [Agent thinks: "I need to draft an email first"]
+  [Agent thinks: "I need to analyze this code first"]
        |
        v
-  [Tool: draft_email] --> creates a formal, structured email
+  [Tool: code_analyze] --> creates an initial explanation in plain English
        |
        v
-  [Agent thinks: "Now I should humanize this draft"]
+  [Agent thinks: "Now I should make this explanation more natural"]
        |
        v
-  [Tool: humanize_email] --> rewrites it to sound natural and warm
+  [Tool: final_code_explanation] --> enhances it to sound conversational and warm with inline comments
        |
        v
-  Final humanized email returned to user
+  Final beginner-friendly code explanation returned to user
 ```
 
 ## Prerequisites
@@ -41,8 +41,8 @@ User's email idea
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/NisargKadam/Langchain_sample_project.git
-cd Langchain_sample_project
+#git clone https://github.com/NisargKadam/Langchain_sample_project.git
+cd Langchain_sample_project_assignment
 ```
 
 ### 2. Create a virtual environment
@@ -92,53 +92,38 @@ You'll see an interactive prompt:
 
 ```
 ============================================================
-  EMAIL HUMANIZER AGENT
+  CODE EXPLAINER AGENT
   Powered by LangChain + OpenAI
 ============================================================
 
-Describe the email you want to write, and the agent will
-create a natural, human-sounding email for you.
+Paste a code snippet, and the agent will explain it
+in simple, beginner-friendly terms.
+```
 
 Type 'quit' to exit.
 
-Your email idea:
+Your code snippet:
 ```
 
-Type your email idea (e.g., `thank my team for finishing the project on time`) and the agent will generate a humanized email. You'll also see detailed logs showing the agent's reasoning and tool calls.
+Type your code snippet (e.g., `def add(a, b): return a + b`) and the agent will generate a beginner-friendly explanation. You'll also see detailed logs showing the agent's reasoning and tool calls.
 
 ## Example
 
 **Input:**
 ```
-thank my team for finishing the project on time
+def add(a, b): return a + b
 ```
 
 **Output:**
 ```
-Subject: Huge Thanks for Your Amazing Work on the Project!
-
-Hey Team,
-
-I hope you're all doing well! I just wanted to take a minute to say a big
-thank you for all the hard work you put into getting the project done on time.
-Your dedication and teamwork really made a difference, and I can't tell you
-how much I appreciate it.
-
-Each of you brought something special to the table, and I'm so proud to be
-part of such a talented group. Let's keep this momentum going and continue
-to achieve great things together!
-
-Thanks again for everything!
-
-Best,
-[Your Name]
+This code defines a simple function called add that takes two numbers and returns their sum. Think of it like a calculator that only does addition - you give it two numbers, and it gives you back the total. For example, if you call add(3, 5), it would return 8. It's a basic building block that other parts of your program can use whenever they need to add two numbers together.
 ```
 
 ## Project Structure
 
 ```
 .
-├── email_humanizer.py   # Main agent code (fully commented)
+├── Code Explainer.py   # Main agent code (fully commented)
 ├── requirements.txt     # Python dependencies
 ├── .env.example         # API key template
 ├── .gitignore           # Keeps secrets and venv out of git
