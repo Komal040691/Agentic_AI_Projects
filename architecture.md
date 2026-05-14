@@ -1,23 +1,48 @@
-# Mental Wellness Practice Suggester -- Architecture
+# Code Explainer Agent -- Architecture
 
 ## How It Works
 
 ```
-User types how they feel
+User enters code snippet
         |
         v
-  [understand_mood] -- acknowledges feeling, classifies severity
+  [decision_node] -- analyzes code complexity (simple vs deep)
         |
-        +---> [suggest_breathing]   \
-        |                            |
-        +---> [suggest_mindfulness]  +--> run in PARALLEL
-        |                            |
-        +---> [suggest_movement]    /
+        +---> [explain_code_plain_english]   \
+        |                                    |
+        +---> [identify_code_risks]          +--> run in PARALLEL (for deep review)
+        |                                    |
+        +---> [add_code_comments]           /
         |
         v
-  [pick_best_practice] -- reads all 3, decides quick vs deep
+  [router] -- routes based on decision_node result
         |
-        +-- MILD/MODERATE --> [quick_practice] --> under 5 min routine
+        +-- SIMPLE --> [simple_code_explanation] --> basic explanation
+        |
+        +-- DEEP --> [deep_code_review] --> comprehensive analysis
+        |
+        v
+  [END] -- final output displayed to user
+```
+
+## State Flow
+
+1. **Initial State**: User provides code snippet
+2. **Decision Phase**: LLM assesses if code needs simple or deep review
+3. **Parallel Analysis** (if deep): Three nodes run simultaneously:
+   - Explain code in plain English
+   - Identify potential bugs/risks
+   - Add inline comments
+4. **Final Review**: Combines all analyses into comprehensive report
+5. **Output**: Displays either simple explanation or deep review
+
+## Key Components
+
+- **CodeState**: Pydantic model holding all data
+- **Decision Node**: Routes to simple or deep review path
+- **Parallel Nodes**: Analyze different aspects simultaneously
+- **Conditional Edges**: Dynamic routing based on complexity
+- **Annotated Messages**: Track execution flow with operator.add
         |
         +-- HIGH ----------> [deep_practice]  --> 10-15 min session
         |

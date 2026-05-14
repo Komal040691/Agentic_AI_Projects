@@ -1,146 +1,124 @@
-# Hospital Medicine Inventory Manager -- Learn LangGraph Step by Step
+# Code Explainer Agent -- Learn LangGraph Step by Step
 
-A beginner-friendly project to learn the LangGraph framework by building a hospital medicine inventory check system.
+A beginner-friendly project to learn the LangGraph framework by building an AI-powered code explanation and review system.
 
 ---
 
-## Understanding LangGraph Through the Tiffin Box Analogy
+## Understanding LangGraph Through the Code Review Analogy
 
-Before diving into code, let us understand how LangGraph works using the **Tiffin Box** (Indian lunch box) analogy.
+Before diving into code, let us understand how LangGraph works using the **Code Review** analogy.
 
-A tiffin box has multiple compartments. Imagine a kitchen where 3 cooks prepare different compartments at the same time (parallel), a supervisor checks the quality (conditional), and either packs it for delivery or sends it back for fixing.
+Imagine a software development team where a developer submits code, and it goes through different reviewers: one checks for bugs, another adds documentation, and a lead reviewer decides if it needs deep review or just basic explanation.
 
-LangGraph works the same way -- but instead of food, we pass **data (state)** through **nodes (functions)** connected by **edges (arrows)**.
+LangGraph works the same way -- but instead of code files, we pass **data (state)** through **nodes (functions)** connected by **edges (arrows)**.
 
 ```
-    THE TIFFIN BOX ANALOGY FOR LANGGRAPH
+    THE CODE REVIEW ANALOGY FOR LANGGRAPH
     =====================================
 
-    Think of LangGraph as a kitchen assembly line:
+    Think of LangGraph as a code review pipeline:
 
     +----------------------------------------------------------+
     |                                                          |
-    |   TIFFIN BOX = STATE (Pydantic Model)                   |
-    |   The box travels through the kitchen.                   |
-    |   Each station fills one compartment.                    |
+    |   CODE SUBMISSION = STATE (Pydantic Model)              |
+    |   The code travels through the review process.           |
+    |   Each reviewer adds their feedback.                     |
     |                                                          |
     |   +-------------+  +-------------+  +-------------+     |
-    |   | Compartment |  | Compartment |  | Compartment |     |
-    |   |   (rice)    |  |   (curry)   |  |   (salad)   |     |
+    |   | Reviewer 1  |  | Reviewer 2  |  | Reviewer 3  |     |
+    |   | (Explains)  |  | (Finds      |  | (Comments)  |     |
+    |   |             |  |  Risks)     |  |             |     |
     |   +-------------+  +-------------+  +-------------+     |
     |                                                          |
     +----------------------------------------------------------+
 
-    NODES = Kitchen Stations (each does one job)
-    EDGES = Conveyor belts connecting stations
-    PARALLEL NODES = Multiple cooks working at the same time
-    CONDITIONAL EDGE = Supervisor deciding: "Pack it or fix it?"
+    NODES = Review Stations (each does one job)
+    EDGES = Workflow connections between stations
+    PARALLEL NODES = Multiple reviewers working simultaneously
+    CONDITIONAL EDGE = Lead reviewer deciding: "Simple or Deep review?"
 
     How data flows:
 
-    [Customer Order]                         <-- START node
+    [Code Submission]                       <-- START node
           |
           v
     +-----------+
-    | Take Order|                            <-- Node 1
+    | Initial   |                            <-- Node 1: Decision
+    | Assessment|                            (Is this simple or complex code?)
     +-----------+
           |
      _____|_____________________
     |            |              |
     v            v              v
-  +------+   +-------+   +-------+
-  | Rice |   | Curry |   | Salad |           <-- Parallel Nodes
-  +------+   +-------+   +-------+              (Fan-Out)
+  +-------+   +-------+   +-------+
+  | Simple|   | Deep  |   | Deep  |         3 POSSIBLE PATHS
+  |Review |   |Review |   |Review |         (Conditional routing)
+  +-------+   +-------+   +-------+
     |            |              |
     |____________|______________|
                  |
-                 v                               (Fan-In)
+                 v                               (Fan-In: All paths lead to END)
          +--------------+
-         | Quality Check|                    <-- Decision Node
-         +--------------+
-                 |
-           ______|______
-          |             |
-     [PASS]         [FAIL]                   <-- Conditional Edge
-          |             |
-          v             v
-    +----------+   +----------+
-    |  Pack    |   |   Fix    |--+
-    |  Tiffin  |   |   Meal   |  |
-    +----------+   +----------+  |
-          |             |        |
-          v             +--------+           <-- Loop (retry)
-        [END]
+         | Final Report |                    <-- END node
+         +--------------+                    Combines all review results
 
 
     KEY LANGGRAPH CONCEPTS:
     -----------------------
-    1. STATE    = The tiffin box itself (holds all data)
-    2. NODE     = A kitchen station (a function that does one thing)
-    3. EDGE     = A conveyor belt (connects one node to the next)
-    4. PARALLEL = Multiple stations working at the same time
-    5. FAN-IN   = Waiting for all parallel stations to finish
-    6. CONDITIONAL EDGE = A supervisor deciding the next step
+    1. STATE    = The code submission itself (holds all data)
+    2. NODE     = A review station (a function that does one thing)
+    3. EDGE     = A workflow connection (connects one node to the next)
+    4. CONDITIONAL EDGE = A decision point routing to different paths
+    5. PARALLEL = Multiple stations could work at the same time
 ```
 
 ---
 
-## Our Project: Hospital Medicine Inventory Check
+## Our Project: AI Code Explainer Agent
 
-Now we apply the same pattern to a real use case. A pharmacist enters a medicine name, and the system runs parallel checks, then makes a decision.
+Now we apply the same pattern to a real use case. A developer enters code, the system analyzes its complexity, then either provides a simple explanation or performs a comprehensive deep review with risks and comments.
 
 ```
-    HOSPITAL INVENTORY CHECK -- GRAPH ARCHITECTURE
-    ================================================
+    CODE EXPLAINER AGENT -- GRAPH ARCHITECTURE
+    ===========================================
 
-              +------------------+
-              |      START       |
-              +--------+---------+
-                       |
-              +--------v---------+
-              | receive_request   |     Pharmacist enters medicine name.
-              +--------+---------+     System acknowledges the request.
-                       |
-          _____________|_______________
+              +-----------------+
+              |     START       |
+              +-------+---------+
+                      |
+              +-------v---------+
+              |  decision_node  |     Developer enters code snippet.
+              +-------+---------+     System assesses complexity.
+                      |
+          ____________|_______________
          |             |               |
          v             v               v
   +-----------+  +-----------+  +----------------+
-  | check     |  | check     |  | check          |    3 PARALLEL NODES
-  | stock     |  | expiry    |  | supplier       |    (Fan-Out)
-  | level     |  | dates     |  | availability   |
-  +-----------+  +-----------+  +----------------+    Each node writes to
-         |             |               |              its own state field.
-         |_____________|_______________|              No conflicts.
+  | explain_  |  | identify_ |  | add_code_      |    3 PARALLEL NODES (for deep review)
+  | code_     |  | code_     |  | comments       |    (Fan-Out)
+  | plain     |  | risks     |  |                |
+  +-----------+  +-----------+  +----------------+    Each node analyzes different aspects.
+         |             |               |              No conflicts.
+         |_____________|_______________|              All write to state.
                        |
               +--------v---------+
-              | inventory        |                    FAN-IN:
-              | decision         |                    Waits for all 3 checks.
-              +--------+---------+                    Reads all results.
-                       |                              Decides: reorder or not?
-                 ______|______
-                |             |
-          [REORDER]       [ALL OK]                    CONDITIONAL EDGE:
-                |             |                       route_after_decision()
-                v             v                       returns "reorder" or "report"
-         +------------+ +---------------+
-         | place      | | generate      |
-         | reorder    | | report        |
-         +-----+------+ +-------+------+
-               |                 |
-               v                 v
-             [END]             [END]
+              | deep_code_       |                    FAN-IN:
+              | review           |                    Combines all analyses.
+              +--------+---------+                    Generates final report.
+                       |
+                       v
+                     [END]
 
 
     STATE FIELDS (Pydantic Model):
     ================================
-    medicine_name      --> Input: what medicine to check
-    stock_status       --> Filled by: check_stock_level
-    expiry_status      --> Filled by: check_expiry_dates
-    supplier_status    --> Filled by: check_supplier_availability
-    needs_reorder      --> Filled by: inventory_decision
-    decision_reason    --> Filled by: inventory_decision
-    final_report       --> Filled by: place_reorder OR generate_report
-    messages           --> Accumulated by ALL nodes (uses operator.add)
+    code           --> Input: the code snippet to analyze
+    review_type    --> Filled by: decision_node ("simple" or "deep")
+    explanation    --> Filled by: explain_code_plain_english (for deep review)
+    risk           --> Filled by: identify_code_risks (for deep review)
+    comments       --> Filled by: add_code_comments (for deep review)
+    final_output   --> Filled by: simple_code_explanation OR deep_code_review
+    messages       --> Accumulated by ALL nodes (uses operator.add)
 ```
 
 ---
@@ -153,57 +131,57 @@ Now we apply the same pattern to a real use case. A pharmacist enters a medicine
 
     Initial State (before graph runs):
     +-----------------------------------+
-    | medicine_name: "Paracetamol 500mg"|
-    | stock_status: ""                  |
-    | expiry_status: ""                 |
-    | supplier_status: ""               |
-    | needs_reorder: False              |
-    | final_report: ""                  |
+    | code: "def hello(): print('Hi')"  |
+    | review_type: ""                   |
+    | explanation: ""                   |
+    | risk: ""                          |
+    | comments: ""                      |
+    | final_output: ""                  |
     | messages: []                      |
     +-----------------------------------+
                     |
                     v
-        [receive_request runs]
+        [decision_node runs]
                     |
                     v
-    After receive_request:
+    After decision_node:
     +-----------------------------------+
-    | medicine_name: "Paracetamol 500mg"|  <-- unchanged
-    | stock_status: ""                  |  <-- not yet filled
-    | expiry_status: ""                 |  <-- not yet filled
-    | supplier_status: ""               |  <-- not yet filled
-    | messages: ["[receive_request]..."]|  <-- appended
+    | review_type: "simple"             |  <-- decision made
+    | messages: ["[decision] assessed"] |  <-- appended
+    +-----------------------------------+
+                    |
+                    v
+    After simple_code_explanation:
+    +-----------------------------------+
+    | final_output: "Simple Code..."    |  <-- final output
+    +-----------------------------------+
+
+    OR (if complex code):
+
+    After decision_node:
+    +-----------------------------------+
+    | review_type: "deep"               |  <-- decision made
     +-----------------------------------+
                     |
         ____________|____________
        |            |            |
        v            v            v
-    [3 parallel nodes run, each fills ONE field]
+    [3 parallel nodes run, each fills fields]
                     |
                     v
     After parallel nodes:
     +-----------------------------------+
-    | stock_status: "Current: 150..."   |  <-- filled by check_stock_level
-    | expiry_status: "Batch A: 2025..." |  <-- filled by check_expiry_dates
-    | supplier_status: "MedCorp: 3..."  |  <-- filled by check_supplier_availability
-    | messages: [..., stock, expiry,    |  <-- all 3 appended (operator.add)
-    |            supplier messages]     |
+    | explanation: "This function..."   |  <-- filled by explain_code_plain_english
+    | risk: "No major bugs found..."    |  <-- filled by identify_code_risks
+    | comments: "def hello():"          |  <-- filled by add_code_comments
+    | messages: [..., explanation,      |  <-- all appended (operator.add)
+    |            risk, comment msgs]    |
     +-----------------------------------+
                     |
                     v
-    After inventory_decision:
+    After deep_code_review:
     +-----------------------------------+
-    | needs_reorder: True               |  <-- decision made
-    | decision_reason: "Stock is low"   |  <-- reason captured
-    +-----------------------------------+
-                    |
-           [conditional edge]
-           needs_reorder = True
-                    |
-                    v
-    After place_reorder:
-    +-----------------------------------+
-    | final_report: "REORDER REQUEST.."|  <-- final output
+    | final_output: "Deep Code Review.."|  <-- combined report
     +-----------------------------------+
 ```
 
@@ -219,8 +197,8 @@ Now we apply the same pattern to a real use case. A pharmacist enters a medicine
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/NisargKadam/langgraph_framework.git
-cd langgraph_framework
+git clone <repository-url>
+cd langgraph_framework_For_Code_Explainer_agent
 
 # 2. Create a virtual environment
 python -m venv venv
@@ -230,53 +208,54 @@ source venv/bin/activate        # On Windows: venv\Scripts\activate
 pip install -r requirements.txt
 
 # 4. Set up your API key
-cp .env.example .env
-# Edit .env and add your OpenAI API key
+# Create a .env file and add your OpenAI API key:
+# OPENAI_API_KEY=your-api-key-here
 
-# 5. Run the inventory check
-python hospital_inventory_graph.py
+# 5. Run the code explainer
+python Code_Agent_graph.py
 ```
 
 ### Expected Output
 
 ```
 ============================================================
-  HOSPITAL MEDICINE INVENTORY CHECK
-  Medicine: Paracetamol 500mg
+  CODE EXPLAINER AGENT
+  You said: "def factorial(n): return n * factorial(n-1) if n > 1 else 1"
 ============================================================
 
---- Receiving request for: Paracetamol 500mg ---
-Request acknowledged: Paracetamol 500mg is a commonly used analgesic and...
+--- [decision] Code complexity assessed ---
 
---- [Parallel] Checking stock level for: Paracetamol 500mg ---
---- [Parallel] Checking expiry dates for: Paracetamol 500mg ---
---- [Parallel] Checking supplier availability for: Paracetamol 500mg ---
-Stock check done: Current quantity: 150 units...
-Expiry check done: Batch A expires: 2025-08-15...
-Supplier check done: Primary supplier: MedCorp...
+--- Making final assessment ---
+Decision: DEEP -- Code contains recursion, needs detailed review
 
---- Making inventory decision for: Paracetamol 500mg ---
-Decision: STOCK OK -- All stock levels are sufficient...
+--- [Parallel] Explaining code in plain English ---
+--- [Parallel] Identifying code risks ---
+--- [Parallel] Adding inline comments ---
 
---- Generating report for: Paracetamol 500mg ---
+--- Generating deep code review ---
 
 ============================================================
-  FINAL RESULT
+  FINAL SUGGESTION
 ============================================================
 
-INVENTORY REPORT -- ALL CLEAR
-========================================
-Paracetamol 500mg inventory is in good standing...
+Deep Code Review:
 
-------------------------------------------------------------
-  MESSAGE LOG (shows the order nodes executed)
-------------------------------------------------------------
-  [receive_request] Checking inventory for Paracetamol 500mg
-  [check_stock_level] Completed stock check
-  [check_expiry_dates] Completed expiry check
-  [check_supplier_availability] Completed supplier check
-  [inventory_decision] Decision: reorder=False
-  [generate_report] Status report generated
+Code Explanation:
+This is a recursive function that calculates the factorial of a number...
+
+Identified Risks and Issues:
+1. Stack overflow for large n values
+2. No input validation
+...
+
+Commented Code:
+def factorial(n):
+    # Base case: factorial of 1 or 0 is 1
+    if n <= 1:
+        return 1
+    # Recursive case: n! = n * (n-1)!
+    else:
+        return n * factorial(n-1)
 ```
 
 ---
@@ -285,12 +264,13 @@ Paracetamol 500mg inventory is in good standing...
 
 | Step | What Happens | File Location |
 |------|-------------|---------------|
-| 1 | Define `InventoryState` with Pydantic | `hospital_inventory_graph.py` line 50 |
-| 2 | Initialize OpenAI LLM | `hospital_inventory_graph.py` line 72 |
-| 3 | Define 6 node functions | `hospital_inventory_graph.py` lines 88-230 |
-| 4 | Define routing function | `hospital_inventory_graph.py` line 244 |
-| 5 | Build graph (add nodes + edges) | `hospital_inventory_graph.py` lines 260-310 |
-| 6 | Compile and run | `hospital_inventory_graph.py` lines 320-360 |
+| 1 | Define `CodeState` with Pydantic | `Code_Agent_graph.py` line 25 |
+| 2 | Initialize OpenAI LLM | `Code_Agent_graph.py` line 32 |
+| 3 | Define decision node | `Code_Agent_graph.py` line 95 |
+| 4 | Define parallel analysis nodes | `Code_Agent_graph.py` lines 40-90 |
+| 5 | Define final review nodes | `Code_Agent_graph.py` lines 125-180 |
+| 6 | Build graph (add nodes + edges) | `Code_Agent_graph.py` lines 185-200 |
+| 7 | Compile and run | `Code_Agent_graph.py` lines 205-280 |
 
 ---
 
@@ -298,10 +278,58 @@ Paracetamol 500mg inventory is in good standing...
 
 1. **State is just a data class** -- Define what data your graph needs using Pydantic fields with defaults.
 
-2. **Nodes are just functions** -- Each function takes state, does one thing, returns a dict of updated fields.
+2. **Nodes are functions** -- Each node is a Python function that takes state and returns a dict of updates.
 
-3. **Parallel is automatic** -- Add multiple edges from one node to many, and LangGraph runs them in parallel.
+3. **Edges connect nodes** -- Use `add_edge()` for direct connections, `add_conditional_edges()` for routing logic.
 
-4. **Conditional edges need a routing function** -- Write a function that returns a string key, map keys to node names.
+4. **Parallel processing** -- LangGraph can run multiple nodes simultaneously when they don't depend on each other.
 
-5. **The graph is just a flowchart** -- You define it in code the same way you would draw it on paper.
+5. **Annotated lists with operators** -- Use `Annotated[list[str], operator.add]` to accumulate messages from multiple nodes.
+
+6. **Conditional routing** -- Router functions return strings that determine which edge to follow.
+
+7. **State is immutable** -- Each node receives the current state and returns updates, LangGraph merges them automatically.
+
+8. **Messages track execution** -- Use a messages field to log what each node did for debugging.
+
+---
+
+## Architecture Diagram
+
+```
+Code Explainer Agent Architecture
+==================================
+
+[User Input: Code Snippet]
+        |
+        v
++-------------------+     +-------------------+
+| decision_node     | --> | Assess Complexity |
+| (Simple/Deep?)    |     | (LLM Analysis)    |
++-------------------+     +-------------------+
+        |
+        +-------------------+
+        |                   |
+    "simple"            "deep"
+        |                   |
+        v                   v
++-------------------+     +-------------------+
+| simple_code_      |     | Parallel Analysis |
+| explanation       |     | Nodes:            |
++-------------------+     | - explain_code    |
+        |             |   | - identify_risks  |
+        |             |   | - add_comments    |
+        |             |   +-------------------+
+        v             |         |
++-------------------+     |         v
+| Final Output      |     | +-------------------+
+| (Simple Review)   |     | | deep_code_review |
++-------------------+     | | (Combine Results) |
+                          | +-------------------+
+                          |         |
+                          |         v
+                          +-------------------+
+                            | Final Output      |
+                            | (Deep Review)     |
+                            +-------------------+
+```
