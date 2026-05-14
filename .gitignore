@@ -1,6 +1,12 @@
 .env
+<<<<<<< HEAD
 venv/
 __pycache__/
 *.pyc
 .vscode/
 LANGGRAPH_TEACHING_GUIDE.md
+=======
+.venv/
+__pycache__/
+*.pyc
+>>>>>>> 064c05a19cceca70574ef302c31c3aa47a186c6c
