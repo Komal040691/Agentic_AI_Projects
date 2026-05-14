@@ -86,7 +86,7 @@ OPENAI_API_KEY=sk-your-actual-key-here
 ## Run
 
 ```bash
-python email_humanizer.py
+python Code Explainer.py
 ```
 
 You'll see an interactive prompt:
